@@ -28,7 +28,7 @@ public class UpdateBlogCommandHandler : IRequestHandler<UpdateBlogCommand>
     public async Task<Unit> Handle(UpdateBlogCommand request, CancellationToken cancellationToken)
     {
         var entity = await _context.Blogs
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+            .FindAsync(new object[] { request.Id}, cancellationToken);
 
         if (entity == null)
         {

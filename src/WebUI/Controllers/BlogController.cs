@@ -11,7 +11,7 @@ namespace CleanArchitecture.WebUI.Controllers;
 public class BlogController : ApiControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<BlogBreifDto>>> GetBlogsWithPagination([FromQuery] GetBlogsWithPaginationQuery query)
+    public async Task<ActionResult<List<BlogBreifDto>>> GetBlogsWithPagination([FromQuery] GetBlogsWithPaginationQuery query)
     {
         return await Mediator.Send(query);
     }

@@ -14,7 +14,7 @@
         "operationId": "Blog_GetBlogsWithPagination",
         "parameters": [
           {
-            "name": "ListId",
+            "name": "PageNumber",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -23,22 +23,13 @@
             "x-position": 1
           },
           {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          },
-          {
             "name": "PageSize",
             "in": "query",
             "schema": {
               "type": "integer",
               "format": "int32"
             },
-            "x-position": 3
+            "x-position": 2
           }
         ],
         "responses": {
@@ -47,7 +38,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfBlogBreifDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BlogBreifDto"
+                  }
                 }
               }
             }
@@ -165,36 +159,6 @@
   },
   "components": {
     "schemas": {
-      "PaginatedListOfBlogBreifDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BlogBreifDto"
-            }
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "hasPreviousPage": {
-            "type": "boolean"
-          },
-          "hasNextPage": {
-            "type": "boolean"
-          }
-        }
-      },
       "BlogBreifDto": {
         "type": "object",
         "additionalProperties": false,

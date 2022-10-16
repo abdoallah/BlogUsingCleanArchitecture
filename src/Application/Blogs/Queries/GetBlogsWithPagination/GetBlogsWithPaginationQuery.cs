@@ -11,14 +11,14 @@ using CleanArchitecture.Application.Common.Models;
 using MediatR;
 
 namespace CleanArchitecture.Application.Blogs.Queries;
-public class GetBlogsWithPaginationQuery : IRequest<PaginatedList<BlogBreifDto>>
+public class GetBlogsWithPaginationQuery : IRequest<List<BlogBreifDto>>
 {
-    public int ListId { get; init; }
+ 
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
 }
 
-public class GetBlogsWithPaginationQueryHandler : IRequestHandler<GetBlogsWithPaginationQuery, PaginatedList<BlogBreifDto>>
+public class GetBlogsWithPaginationQueryHandler : IRequestHandler<GetBlogsWithPaginationQuery, List<BlogBreifDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -29,13 +29,12 @@ public class GetBlogsWithPaginationQueryHandler : IRequestHandler<GetBlogsWithPa
         _mapper = mapper;
     }
 
-    public async Task<PaginatedList<BlogBreifDto>> Handle(GetBlogsWithPaginationQuery request, CancellationToken cancellationToken)
+    public async Task<List<BlogBreifDto>> Handle(GetBlogsWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        return await _context.Blogs
-            .Where(x => x.Id == request.ListId)
+        return  _context.Blogs
             .OrderBy(x => x.Title)
-            .ProjectTo<BlogBreifDto>(_mapper.ConfigurationProvider)
-            .PaginatedListAsync(request.PageNumber, request.PageSize);
+            .ProjectTo<BlogBreifDto>(_mapper.ConfigurationProvider).ToList();
+            
     }
 }
 

@@ -16,7 +16,7 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IBlogClient {
-    getBlogsWithPagination(listId: number | undefined, pageNumber: number | undefined, pageSize: number | undefined): Observable<PaginatedListOfBlogBreifDto>;
+    getBlogsWithPagination(pageNumber: number | undefined, pageSize: number | undefined): Observable<BlogBreifDto[]>;
     create(command: CreateBlogCommand): Observable<number>;
     update(id: number, command: UpdateBlogCommand): Observable<FileResponse>;
     delete(id: number): Observable<FileResponse>;
@@ -35,12 +35,8 @@ export class BlogClient implements IBlogClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    getBlogsWithPagination(listId: number | undefined, pageNumber: number | undefined, pageSize: number | undefined): Observable<PaginatedListOfBlogBreifDto> {
+    getBlogsWithPagination(pageNumber: number | undefined, pageSize: number | undefined): Observable<BlogBreifDto[]> {
         let url_ = this.baseUrl + "/api/Blog?";
-        if (listId === null)
-            throw new Error("The parameter 'listId' cannot be null.");
-        else if (listId !== undefined)
-            url_ += "ListId=" + encodeURIComponent("" + listId) + "&";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
         else if (pageNumber !== undefined)
@@ -66,14 +62,14 @@ export class BlogClient implements IBlogClient {
                 try {
                     return this.processGetBlogsWithPagination(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<PaginatedListOfBlogBreifDto>;
+                    return _observableThrow(e) as any as Observable<BlogBreifDto[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<PaginatedListOfBlogBreifDto>;
+                return _observableThrow(response_) as any as Observable<BlogBreifDto[]>;
         }));
     }
 
-    protected processGetBlogsWithPagination(response: HttpResponseBase): Observable<PaginatedListOfBlogBreifDto> {
+    protected processGetBlogsWithPagination(response: HttpResponseBase): Observable<BlogBreifDto[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -84,7 +80,14 @@ export class BlogClient implements IBlogClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PaginatedListOfBlogBreifDto.fromJS(resultData200);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(BlogBreifDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -249,70 +252,6 @@ export class BlogClient implements IBlogClient {
         }
         return _observableOf(null as any);
     }
-}
-
-export class PaginatedListOfBlogBreifDto implements IPaginatedListOfBlogBreifDto {
-    items?: BlogBreifDto[];
-    pageNumber?: number;
-    totalPages?: number;
-    totalCount?: number;
-    hasPreviousPage?: boolean;
-    hasNextPage?: boolean;
-
-    constructor(data?: IPaginatedListOfBlogBreifDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(BlogBreifDto.fromJS(item));
-            }
-            this.pageNumber = _data["pageNumber"];
-            this.totalPages = _data["totalPages"];
-            this.totalCount = _data["totalCount"];
-            this.hasPreviousPage = _data["hasPreviousPage"];
-            this.hasNextPage = _data["hasNextPage"];
-        }
-    }
-
-    static fromJS(data: any): PaginatedListOfBlogBreifDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PaginatedListOfBlogBreifDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["pageNumber"] = this.pageNumber;
-        data["totalPages"] = this.totalPages;
-        data["totalCount"] = this.totalCount;
-        data["hasPreviousPage"] = this.hasPreviousPage;
-        data["hasNextPage"] = this.hasNextPage;
-        return data;
-    }
-}
-
-export interface IPaginatedListOfBlogBreifDto {
-    items?: BlogBreifDto[];
-    pageNumber?: number;
-    totalPages?: number;
-    totalCount?: number;
-    hasPreviousPage?: boolean;
-    hasNextPage?: boolean;
 }
 
 export class BlogBreifDto implements IBlogBreifDto {

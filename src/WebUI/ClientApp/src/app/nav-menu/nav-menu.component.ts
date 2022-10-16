@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { DialogComponent } from '../dialog/dialog.component';
 
 @Component({
   selector: 'app-nav-menu',
@@ -6,6 +8,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./nav-menu.component.scss']
 })
 export class NavMenuComponent {
+  constructor(private dialog:MatDialog){
+
+  }
   isExpanded = false;
 
   collapse() {
@@ -14,5 +19,10 @@ export class NavMenuComponent {
 
   toggle() {
     this.isExpanded = !this.isExpanded;
+  }
+  openDialog() {
+    this.dialog.open(DialogComponent, {
+     width:'30%'
+    });
   }
 }
